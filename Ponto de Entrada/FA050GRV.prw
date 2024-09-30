@@ -23,8 +23,9 @@ User Function FA050GRV()
 	Local cAmb      := GetArea()
     Local cTabTmp	:= GetNextAlias()
 	Local cGrpApr   := ''
+    Local cTipo     := SUPERGETMV("MV_XTPFIN", .T., "FOL")
     
-    IF SE2->E2_TIPO <> 'FOL' 
+    IF !SE2->E2_TIPO $ cTipo 
 
         BeginSql Alias cTabTmp					
 
@@ -56,7 +57,7 @@ User Function FA050GRV()
             If DbSeek(xfilial("SCR")+"FN"+SE2->(E2_PREFIXO+E2_NUM+E2_PARCELA+E2_TIPO+E2_FORNECE+E2_LOJA))
 
                 While !SCR->(EOF()) .AND. ALLTRIM(xfilial("SCR")+"FN"+SE2->(E2_PREFIXO+E2_NUM+E2_PARCELA+E2_TIPO+E2_FORNECE+E2_LOJA)) == ALLTRIM(SCR->(CR_FILIAL+CR_TIPO+CR_NUM))
-                    If SCR->CR_NIVEL == "01"                    
+                    If Alltrim(SCR->CR_NIVEL) $ "01|1"
                         U_dpowf001(UsrRetMail(SCR->CR_USER),; 
                                     ALLTRIM(SCR->(CR_FILIAL+CR_TIPO+CR_NUM)),; 
                                     UsrFullName(SCR->CR_USER),; 
