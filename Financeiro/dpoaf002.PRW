@@ -105,21 +105,18 @@ User Function dpoaf002(nReg,cNumDoc)
 				ElseIf aHeader[nX][02] == "bCR_SITUACA"
 					Do Case
 					Case (cAliasSCR)->CR_STATUS == "01"
-						cSituaca := "Aguardando"
-						lBloq := .T.
+						cSituaca := "Aguardando"						
 					Case (cAliasSCR)->CR_STATUS == "02"
-						cSituaca := "Em Aprovacao"
-						lBloq := .T.
+						cSituaca := "Em Aprovacao"						
 					Case (cAliasSCR)->CR_STATUS == "03"
 						cSituaca := "Aprovado" 
 					Case (cAliasSCR)->CR_STATUS == "04"
 						cSituaca := "Bloqueado"                
-						lBloq := .T.
+						lBloq := .T. 
 					Case (cAliasSCR)->CR_STATUS == "05"
-						cSituaca := "Nivel Liberado "
-						lBloq := .T.
+						cSituaca := "Nivel Liberado "						
 					EndCase
-					aCols[nY][nX] := cSituaca
+					aCols[nY][nX] := cSituaca					
 				ElseIf aHeader[nX][02] == "bCR_NOMELIB"
 					aCols[nY][nX] := UsrRetName((cAliasSCR)->CR_USERLIB)
 				ElseIf ( aHeader[nX][10] != "V")
@@ -134,11 +131,11 @@ User Function dpoaf002(nReg,cNumDoc)
 		EndDo
 
 		If !Empty(aCols)
-			If lBloq
-				cStatus := "Pendente de Aprovação"
+			If lBloq 
+				cStatus := 'BLOQUEADO'
 			Else 
-				cStatus := "Aprovado"
-			EndIf	
+				cStatus := cSituaca
+			Endif 
 			n:=	 IIF(n > Len(aCols), Len(aCols), n)  
 			DEFINE FONT oBold NAME "Arial" SIZE 0, -12 BOLD
 			DEFINE MSDIALOG oDlg TITLE OemToAnsi("APROVAÇÃO CONTAS A PAGAR") From 109,095 To 400,600 OF oMainWnd PIXEL	 

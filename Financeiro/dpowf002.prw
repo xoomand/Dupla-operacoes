@@ -24,17 +24,20 @@ User Function dpowf002(oProcess)
 	
 	conout("(RETORNO)Processo: " + oProcess:fProcessID + " - Task: " + oProcess:fTaskID )
 	ConOut( "Testando variaveis " , UsrRetMail(c_User), AllTrim(c_ChvScr), UsrFullName(c_User), c_ChvSe2, a_VetScr[1], CenArr2Str(a_VetSe2, ";"), CenArr2Str(a_VetScr, ";"))
-	If AllTrim( c_Opc ) == 'S'
-			
-		dbSelectArea("SCR")
-		dbSetOrder(2)
-		// ConOut( "Tentando - " + PadR(c_ChvScr,56) + c_User )
-		If dbSeek(PadR(c_ChvScr,56) + a_VetScr[6] )
-			ConOut( "MaAlcDoc" )
-			l_Libera := MaAlcDoc({SCR->CR_NUM,SCR->CR_TIPO,SCR->CR_TOTAL,SCR->CR_APROV,c_User,SCR->CR_GRUPO,,,,,c_Obs},dDatabase,If(nOpc==2,4,6) ,, @l_Niv)
-			//l_Libera := MaAlcDoc({a_VetScr[2],a_VetScr[3],1000,a_VetScr[5],a_VetScr[6],a_VetScr[7],,,,,c_Obs},dDatabase,If(nOpc==2,4,6) ,, @l_Niv)
-			//						CR_NUM   ,CR_TIPO    ,CR_TOTAL   ,CR_APROV   ,CR_USER    ,CR_GRUPO
-			ConOut( "Teste liberado: ", l_Libera )
+				
+	dbSelectArea("SCR")
+	dbSetOrder(2)		
+	If dbSeek(PadR(c_ChvScr,56) + a_VetScr[6] )
+		ConOut( "MaAlcDoc" )
+		
+		If Empty(Alltrim(c_Obs)) .And. nOpc == 4
+			c_Obs := "Titulo não aprovado!"
+		Endif 
+
+		l_Libera := MaAlcDoc({SCR->CR_NUM,SCR->CR_TIPO,SCR->CR_TOTAL,SCR->CR_APROV,c_User,SCR->CR_GRUPO,,,,,c_Obs},dDatabase,If(nOpc==2,4,6) ,, @l_Niv)		
+		
+		ConOut( "Teste liberado: ", l_Libera )
+		If nOpc==2
 			If !l_Libera
 				ConOut( "Liberado Nivel 1" )
 				
@@ -81,8 +84,7 @@ User Function dpowf002(oProcess)
 				(cAliasSCR)->(dbSkip())
 			Endif 
 		Endif 
-
 	Endif
-				
+			
 	RestArea(aArea)
 Return

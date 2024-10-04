@@ -11,26 +11,28 @@ Local lret      := .T.
 Local cNumDoc   := SE2->(E2_PREFIXO+E2_NUM+E2_PARCELA+E2_TIPO+E2_FORNECE+E2_LOJA)
 
 //Verifica se o título já tem aprovador
-lret    := fTemAprov() 
+// lret    := fTemAprov() 
 
-If !lret
-    aviso("Atenção","Esse título já teve aprovação por parte de gestores, solicite o estorno da aprovação para poder excluir o título",{"OK"})
-    Return(lRet)
-else
-    fDelSCRFN()
-ENDIF
+// If !lret
+//     aviso("Atenção","Esse título já teve aprovação por parte de gestores, solicite o estorno da aprovação para poder excluir o título",{"OK"})
+//     Return(lRet)
+// else
+//     fDelSCRFN()
+// ENDIF
 
-If lret        
+// If lret        
     cUpdate	:= " UPDATE " + RetSqlName("SCR") +" "
-    cUpdate	+= " SET D_E_L_E_T_ = '*' 
+    cUpdate	+= " SET D_E_L_E_T_ = '*', 
+    cUpdate	+= " R_E_C_D_E_L_ = R_E_C_N_O_ 
     cUpdate	+= " WHERE CR_NUM  = '"+cNumDoc+"' "
-    cUpdate	+= " AND D_E_L_E_T_ = '' "
+    cUpdate += " AND CR_TIPO     = 'FN' "	
+    cUpdate	+= " AND D_E_L_E_T_ <> '*' "
 
     nRet := TcSqlExec(cUpdate) 
     if nRet < 0 
         Alert(Time() +  "Erro: " + TCSQLError() )
     endif
-Endif
+// Endif
 
 Return(lret)
 ***************************
@@ -44,7 +46,7 @@ Local lRetAPV   := .T.
 cTitulo := SE2->(E2_PREFIXO+E2_NUM+E2_PARCELA+E2_TIPO+E2_FORNECE+E2_LOJA)
 
 cQuery  := " SELECT count(*) AS TEMAPV FROM "+ RETSQLNAME("SCR") + " A "
-cQuery  += " WHERE D_E_L_E_T_ = ''
+cQuery  += " WHERE D_E_L_E_T_ <> '*'
 cQuery  += " AND CR_FILIAL   = '"+SE2->E2_FILIAL+"' 
 cQuery  += " AND CR_NUM      = '"+cTitulo+"'
 cQuery  += " AND CR_TIPO     = 'FN' "
@@ -70,7 +72,7 @@ Local cTitulo   := ""
 cTitulo := SE2->(E2_PREFIXO+E2_NUM+E2_PARCELA+E2_TIPO+E2_FORNECE+E2_LOJA)
 
 cQuery  := " SELECT * FROM "+ RETSQLNAME("SCR") + " A "
-cQuery  += " WHERE D_E_L_E_T_ = ''
+cQuery  += " WHERE D_E_L_E_T_ <> '*'
 cQuery  += " AND CR_FILIAL   = '"+SE2->E2_FILIAL+"' 
 cQuery  += " AND CR_NUM      = '"+cTitulo+"'
 cQuery  += " AND CR_TIPO     = 'FN' "
