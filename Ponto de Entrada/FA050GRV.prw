@@ -24,8 +24,9 @@ User Function FA050GRV()
     Local cTabTmp	:= GetNextAlias()
 	Local cGrpApr   := ''
     Local cTipo     := SUPERGETMV("MV_XTPFIN", .T., "FOL")
+    Local cNatNeg   := SUPERGETMV("MV_XNTFIN", .T., "32101|32102")
     
-    IF !SE2->E2_TIPO $ cTipo 
+    IF !SE2->E2_TIPO $ cTipo  .Or. !SE2->E2_NATUREZ $ cNatNeg  
 
         BeginSql Alias cTabTmp					
 

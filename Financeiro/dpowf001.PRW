@@ -24,6 +24,7 @@ User Function dpowf001(cMail, cChvScr, cNomeUsu, cChvSe2, aSCR, aSE2)
 	Local cAssunto   := 'Aprovação de Pagamento'
 	Local cURLBrw 	 := AllTrim(GetMv("MV_XWFBRWS")) //IP ou nome do servidor HTTP
 	Local cContaWF   := SUPERGETMV("MV_YCONTA", .T., "oliveiramarcos55@hotmail.com") //Conta de e-mail para recebimento da resposta do WF
+	Local cImageWF   := SUPERGETMV("MV_XIMGWF", .T., "") //Conta de e-mail para recebimento da resposta do WF
 	Local cPrefixo 	 := aSE2[1]
 	Local cNumTit	 := IIF(EMPTY(aSE2[2]), aSE2[3], aSE2[3]+" / "+aSE2[2])
 	// Local cParc	  	 
@@ -32,13 +33,18 @@ User Function dpowf001(cMail, cChvScr, cNomeUsu, cChvSe2, aSCR, aSE2)
 	Local cCentCus   := aSE2[6]+' - '+POSICIONE("CTT", 1, XFILIAL("CTT")+aSE2[6], "CTT_DESC01")
 	Local cValor   	 :=	"R$ "+ Alltrim(Transform(aSE2[7],"@E 999,999,999.99"))
 	Local cHist 	 := aSE2[8]
+	Local cFilName 	 := FWFilialName()
+	Local cTemplat	 := "\html\template_wf_"+cEmpAnt+cFilAnt+".html"
+	Local cModel	 := "html\wfaprtit_"+cEmpAnt+cFilAnt+".html"
 
 	ConOut( "dpowf001 enviando email para:",cMail, cChvScr, cNomeUsu, cChvSe2, CenArr2Str(aSCR,";"), CenArr2Str(aSE2,";"))
 	oProcess := TWFProcess():New("000001",cAssunto)
-	oProcess:NewTask(cAssunto, "\html\template_wf.html")
+	
+	oProcess:NewTask(cAssunto, cTemplat)
 
 	//cHtml := StrTran(cHtml,"!Destino!",cDestino)
 	oProcess:ohtml:ValByName( "cnome"		, cNomeUsu 	)
+	oProcess:oHtml:ValByName( "c_Image" 	, cImageWF	)
 	oProcess:oHtml:ValByName( "c_Prefixo" 	, cPrefixo	)
 	oProcess:oHtml:ValByName( "c_NumTit" 	, cNumTit	)
 	oProcess:oHtml:ValByName( "c_Tipo" 		, cTipo	 	)
@@ -79,14 +85,15 @@ User Function dpowf001(cMail, cChvScr, cNomeUsu, cChvSe2, aSCR, aSE2)
 	//Apagando  o arquivo gerado
     fErase("\workflow\emp"+cEmpAnt+"\wf\"+cHtmlFile)
 
-	cHtmlModelo := "html\wfaprtit.html"
+	cHtmlModelo := cModel
 	
 	oProcess:NewTask(cAssunto, cHtmlModelo)
 	FWLogMsg('INFO',, 'SIGAFIN', funName(), '', '01', "(INICIO|WFLINK)Processo: " + oProcess:fProcessID + " - Task: " + oProcess:fTaskID , 0, 0)
 
 	oProcess:cSubject := cAssunto
 	oProcess:cTo := cMail 
-	oProcess:ohtml:ValByName("c_Empresa", iif(cEmpAnt == "01", "GRUPO DUPLA", "SPEED MARKETING" ))
+	oProcess:ohtml:ValByName("c_Empresa", cFilName)
+	oProcess:ohtml:ValByName("c_Image" 	, cImageWF)
 	oProcess:ohtml:ValByName("cnome"	, FwGetUserName( __cUserId ) )
 	oProcess:ohtml:ValByName("c_AcaoD"	, "incluiu")	
 	oProcess:ohtml:ValByName("c_http"	, "http://"+cURLBrw+"/emp"+cEmpAnt+"/wf/" + cMailID + ".html")
